@@ -22,6 +22,15 @@ function App() {
   const [hasQueried, setHasQueried] = useState(false)
   const [tokenDataObjects, setTokenDataObjects] = useState([])
   const { colorMode, toggleColorMode } = useColorMode()
+  const [account, setAccount] = useState(null)
+
+  const connectHandler = async () => {
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    })
+    const account = ethers.utils.getAddress(accounts[0])
+    setAccount(account)
+  }
 
   async function getTokenBalance() {
     const config = {
@@ -65,7 +74,7 @@ function App() {
           >
             <Button
               fontSize={20}
-              onClick={getTokenBalance}
+              onClick={connectHandler}
               mt={36}
               bgColor="#65db7f"
             >
