@@ -21,7 +21,7 @@ function App() {
   const [results, setResults] = useState([])
   const [hasQueried, setHasQueried] = useState(false)
   const [tokenDataObjects, setTokenDataObjects] = useState([])
-  const { colorMode, toggleColorMode } = useColorMode()
+  // const { colorMode, toggleColorMode } = useColorMode()
   const [account, setAccount] = useState(null)
 
   const connectHandler = async () => {
@@ -55,6 +55,10 @@ function App() {
     setTokenDataObjects(await Promise.all(tokenDataPromises))
     setHasQueried(true)
   }
+
+  const number = "123.45678"
+  const decimalIndex = number.indexOf(".")
+
   return (
     <>
       {/* <IconButton
@@ -145,7 +149,7 @@ function App() {
                       {Utils.formatUnits(
                         e.tokenBalance,
                         tokenDataObjects[i].decimals,
-                      )}
+                      ).slice(0, 8)}
                     </Box>
                     <Image src={tokenDataObjects[i].logo} />
                   </Flex>
