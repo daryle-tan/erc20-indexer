@@ -14,11 +14,12 @@ import {
 } from "@chakra-ui/react"
 import { Alchemy, Network, Utils } from "alchemy-sdk"
 import { useState } from "react"
+import { ethers } from "ethers"
 // import { FaMoon, FaSun } from "react-icons/fa"
 
 function App() {
   const [userAddress, setUserAddress] = useState("")
-  const [results, setResults] = useState([])
+  const [results, setResults] = useState(false)
   const [hasQueried, setHasQueried] = useState(false)
   const [tokenDataObjects, setTokenDataObjects] = useState([])
   // const { colorMode, toggleColorMode } = useColorMode()
@@ -30,6 +31,15 @@ function App() {
     })
     const account = ethers.utils.getAddress(accounts[0])
     setAccount(account)
+    if (account) {
+      console.log("User is connected! Address:", account)
+    } else {
+      console.log("User is no longer connected!")
+    }
+  }
+
+  const disconnectHandler = () => {
+    setAccount(false)
   }
 
   async function getTokenBalance() {
@@ -41,6 +51,7 @@ function App() {
     const alchemy = new Alchemy(config)
     const data = await alchemy.core.getTokenBalances(userAddress)
 
+    console.log("Loading token balances...")
     setResults(data)
 
     const tokenDataPromises = []
@@ -56,36 +67,46 @@ function App() {
     setHasQueried(true)
   }
 
-  const number = "123.45678"
-  const decimalIndex = number.indexOf(".")
-
   return (
     <>
-      {/* <IconButton
-        icon={colorMode === "light" ? <FaSun /> : <FaMoon />}
-        isRound="true"
-        size="lg"
-        alignSelf="flex-end"
-        onClick={toggleColorMode}
-        margin="5px"
-      /> */}
       <Box w="100vw">
-        <Center>
-          <Flex
-            alignItems={"center"}
-            justifyContent="center"
-            flexDirection={"column"}
-          >
-            <Button
-              fontSize={20}
-              onClick={connectHandler}
-              mt={36}
-              bgColor="#65db7f"
-            >
-              Connect Wallet
-            </Button>
-          </Flex>
-        </Center>
+        <>
+          {account ? (
+            <Center>
+              <Flex
+                alignItems={"center"}
+                justifyContent="center"
+                flexDirection={"column"}
+              >
+                <Button
+                  fontSize={20}
+                  onClick={disconnectHandler}
+                  mt={36}
+                  bgColor="orange"
+                >
+                  Disconnect Wallet
+                </Button>
+              </Flex>
+            </Center>
+          ) : (
+            <Center>
+              <Flex
+                alignItems={"center"}
+                justifyContent="center"
+                flexDirection={"column"}
+              >
+                <Button
+                  fontSize={20}
+                  onClick={connectHandler}
+                  mt={36}
+                  bgColor="#65db7f"
+                >
+                  Connect Wallet
+                </Button>
+              </Flex>
+            </Center>
+          )}
+        </>
         <Center>
           <Flex
             alignItems={"center"}
@@ -129,7 +150,7 @@ function App() {
           </Button>
 
           <Heading my={36}>ERC-20 token balances:</Heading>
-
+          {/* {results && !hasQueried ? "Loading Tokens..." : null} */}
           {hasQueried ? (
             <SimpleGrid w={"90vw"} columns={4} spacing={24}>
               {results.tokenBalances.map((e, i) => {
@@ -156,6 +177,8 @@ function App() {
                 )
               })}
             </SimpleGrid>
+          ) : results && !hasQueried ? (
+            "Loading Tokens..."
           ) : (
             "Please make a query! This may take a few seconds..."
           )}
