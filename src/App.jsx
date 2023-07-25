@@ -26,13 +26,14 @@ function App() {
   const [account, setAccount] = useState(null)
 
   const connectHandler = async () => {
-    const accounts = await window.ethereum.request({
+    const addresses = await window.ethereum.request({
       method: "eth_requestAccounts",
     })
-    const account = ethers.utils.getAddress(accounts[0])
-    setAccount(account)
-    if (account) {
-      console.log("User is connected! Address:", account)
+    const address = ethers.utils.getAddress(addresses[0])
+    setAccount(true)
+    setUserAddress(address)
+    if (address) {
+      console.log("User is connected! Address:", address)
     } else {
       console.log("User is no longer connected!")
     }
@@ -40,6 +41,7 @@ function App() {
 
   const disconnectHandler = () => {
     setAccount(false)
+    setUserAddress(null)
   }
 
   async function getTokenBalance() {
@@ -51,7 +53,7 @@ function App() {
     const alchemy = new Alchemy(config)
     const data = await alchemy.core.getTokenBalances(userAddress)
 
-    console.log("Loading token balances...")
+    console.log("Loading token balances...", data)
     setResults(data)
 
     const tokenDataPromises = []
@@ -67,6 +69,10 @@ function App() {
     setHasQueried(true)
   }
 
+  async function connectAndGetBalance() {
+    const connect = await connectHandler()
+    const getBalance = await getTokenBalance()
+  }
   return (
     <>
       <Box w="100vw">
@@ -97,7 +103,11 @@ function App() {
               >
                 <Button
                   fontSize={20}
-                  onClick={connectHandler}
+                  // onClick={() => {
+                  //   getTokenBalance(userAddress)
+                  //   connectHandler()
+                  // }}
+                  onClick={connectAndGetBalance}
                   mt={36}
                   bgColor="#65db7f"
                 >
