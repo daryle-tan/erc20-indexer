@@ -13,16 +13,14 @@ import {
   useColorMode,
 } from "@chakra-ui/react"
 import { Alchemy, Network, Utils } from "alchemy-sdk"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ethers } from "ethers"
-// import { FaMoon, FaSun } from "react-icons/fa"
 
 function App() {
   const [userAddress, setUserAddress] = useState("")
   const [results, setResults] = useState(false)
   const [hasQueried, setHasQueried] = useState(false)
   const [tokenDataObjects, setTokenDataObjects] = useState([])
-  // const { colorMode, toggleColorMode } = useColorMode()
   const [account, setAccount] = useState(null)
 
   const connectHandler = async () => {
@@ -30,14 +28,19 @@ function App() {
       method: "eth_requestAccounts",
     })
     const address = ethers.utils.getAddress(addresses[0])
+
     setAccount(true)
     setUserAddress(address)
-    if (address) {
-      console.log("User is connected! Address:", address)
+  }
+
+  useEffect(() => {
+    if (userAddress) {
+      console.log("User is connected! Address:", userAddress)
+      getTokenBalance()
     } else {
       console.log("User is no longer connected!")
     }
-  }
+  }, [userAddress])
 
   const disconnectHandler = () => {
     setAccount(false)
@@ -69,10 +72,6 @@ function App() {
     setHasQueried(true)
   }
 
-  async function connectAndGetBalance() {
-    const connect = await connectHandler()
-    const getBalance = await getTokenBalance()
-  }
   return (
     <>
       <Box w="100vw">
@@ -103,11 +102,7 @@ function App() {
               >
                 <Button
                   fontSize={20}
-                  // onClick={() => {
-                  //   getTokenBalance(userAddress)
-                  //   connectHandler()
-                  // }}
-                  onClick={connectAndGetBalance}
+                  onClick={connectHandler}
                   mt={36}
                   bgColor="#65db7f"
                 >
@@ -160,7 +155,6 @@ function App() {
           </Button>
 
           <Heading my={36}>ERC-20 token balances:</Heading>
-          {/* {results && !hasQueried ? "Loading Tokens..." : null} */}
           {hasQueried ? (
             <SimpleGrid w={"90vw"} columns={4} spacing={24}>
               {results.tokenBalances.map((e, i) => {
