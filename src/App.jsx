@@ -8,9 +8,6 @@ import {
   Input,
   SimpleGrid,
   Text,
-  // ColorModeScript,
-  // IconButton,
-  useColorMode,
 } from "@chakra-ui/react"
 import { Alchemy, Network, Utils } from "alchemy-sdk"
 import { useState, useEffect } from "react"
@@ -40,7 +37,7 @@ function App() {
     } else {
       console.log("User is no longer connected!")
     }
-  }, [userAddress])
+  }, [account])
 
   const disconnectHandler = () => {
     setAccount(false)
